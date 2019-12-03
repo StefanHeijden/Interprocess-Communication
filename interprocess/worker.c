@@ -31,7 +31,6 @@ static void rsleep (int t);
 static char                 mq_FW[MQ_MAX_MESSAGES];
 static char                 mq_WF[MQ_MAX_MESSAGES];
 
-
 int main (int argc, char * argv[])
 {
     // TODO:
@@ -51,7 +50,7 @@ int main (int argc, char * argv[])
     mq_fd_response = mq_open (mq_WF, O_WRONLY | O_EXCL);
 
   //  printf ("information: %s, '", mq_FW);
-   
+    printf("Start message\n");
     //  * repeatingly:
 	while(processing){
     //      - read from a message queue the new job to do
@@ -64,25 +63,34 @@ int main (int argc, char * argv[])
 	} 
 	
 	//      - do that job
-	
+
 	// Create string of a of length req
-	int len = sizeof(mq_fd_request); // length of the req hashvalue
+	int len = req.LENGTH; // length of the req hashvalue
 	char check[len + 1];
 	
 	check[len] = '\0';
-	
+	/*
+	// TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	uint128_t test_hash;
+    for(int i = 0; i < len; i++){
+		check[i] = ALPHABET_END_CHAR;
+	}    
+	test_hash = md5s(check, 4);
+	// TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	*/
 	for(int i = 0; i < len; i++){
-		check[i] = 'a';
+		check[i] = ALPHABET_START_CHAR;
 	}
-	check[len] = 'a' ;// first char from the queu????
-	
+	check[len] = req.WORD_START_CHAR ;// first char from the queu
+	printf("Start hashing\n");
 	// Check each possible md5s value for certain string length
 	bool found = false;
 	uint128_t new_hash;
 	while(!found){
 		// Compare hash value for current string
 		new_hash = md5s(check, len);
-		if(new_hash == mq_fd_request) { 
+		if(new_hash == req.MD5) { 
+			printf("Found hash\n");
 			found = true; // Stop if its found
 		}
 		// update checkvalue
@@ -92,12 +100,13 @@ int main (int argc, char * argv[])
 			// If char is last then make it first and update char to the left
 			if(check[pointer] == ALPHABET_END_CHAR) {
 				check[pointer] = ALPHABET_START_CHAR;
-				if(pointer >= 0) {
+				if(pointer > 0) {
 					pointer = pointer - 1; 
 				}
 				else{
 					updated = true;
-					//error?
+					found = true;
+					printf("ERROR, didn't find solution for hash value\n");
 				}
 			}
 			// if not then update it, so that for example a --> b 
@@ -107,7 +116,7 @@ int main (int argc, char * argv[])
 			}
 		}
 	}
-
+	printf("Write results\n");
     //      - write the results to a message queue
     //    until there are no more tasks to do
 	mq_send(mq_fd_response, (char *) &rsp, sizeof(rsp), 0);
