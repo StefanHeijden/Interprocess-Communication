@@ -26,8 +26,9 @@ typedef struct
 } MQ_REQUEST_MESSAGE;       // would need change maybe
 
 typedef struct
-{	int LENGTH;
-    
+{	int ID;	
+	int LENGTH;
+    	char M[MAX_MESSAGE_LENGTH};
 } MQ_RESPONSE_MESSAGE; //would need change maybe
 
 #endif
