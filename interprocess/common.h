@@ -16,17 +16,19 @@
 
 // TODO: put your definitions of the datastructures here
 
+#include "uint128.h"
+
 typedef struct
 {
-    char A_START_CHAR;
-    char A_END_CHAR;
+    //char A_START_CHAR;
+    //char A_END_CHAR;
     char WORD_START_CHAR;
-    int WORD_LENGTH;
+    int LENGTH;
     uint128_t MD5;
 } MQ_REQUEST_MESSAGE;       // would need change maybe
 
 typedef struct
-{
+{	int LENGTH;
     
 } MQ_RESPONSE_MESSAGE; //would need change maybe
 
