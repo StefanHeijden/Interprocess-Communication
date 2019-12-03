@@ -30,8 +30,7 @@
 
 static char                 mq_FW[MQ_MAX_MESSAGES];
 static char                 mq_WF[MQ_MAX_MESSAGES];
-mqd_t               mq_fd_request;
-mqd_t               mq_fd_response;
+
 int NROF_MESSAGES = 0;
 int NROF_RECEIVED_MESSAGES = 0;
 char JOB_CHAR = ALPHABET_START_CHAR; 
@@ -48,8 +47,8 @@ int main (int argc, char * argv[])
     //  * create the message queues (see message_queue_test() in interprocess_basic.c)
 
 	    pid_t               processID[NROF_WORKERS];      /* Process ID from fork() */
-	    mqd_t               mq_farmer_worker;
-	    mqd_t               mq_worker_farmer;
+	    mqd_t               mq_fd_request;
+	    mqd_t               mq_fd_response;
 	    MQ_REQUEST_MESSAGE  req;
 	    MQ_RESPONSE_MESSAGE rsp;
 	    struct mq_attr      attr;
