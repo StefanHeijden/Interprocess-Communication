@@ -20,8 +20,6 @@
 
 typedef struct
 {
-    //char A_START_CHAR;
-    //char A_END_CHAR;
     char WORD_START_CHAR;
     int LENGTH;
     uint128_t MD5;
