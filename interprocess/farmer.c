@@ -31,7 +31,7 @@
 static char                 mq_FW[MQ_MAX_MESSAGES];
 static char                 mq_WF[MQ_MAX_MESSAGES];
 
-int NROF_MESSAGES = 0;
+int NROF_SENT_MESSAGES = 0;
 int NROF_RECEIVED_MESSAGES = 0;
 char JOB_CHAR = ALPHABET_START_CHAR; 
 
@@ -69,28 +69,47 @@ int main (int argc, char * argv[])
 
 	printf ("parent pid:%d\n", getpid()); //noneed
 	for (int i=0; i< NROF_WORKERS; i++){
+
 		processID[i] = fork();
 
-        if (processID[i] < 0)
-	    {
-		perror("fork() failed");
-		exit (1);
-	    }
-	    else
-	    {
-		if (processID[i] == 0)
-		{
-		    printf ("child  pid:%d\n", getpid()); //noneed
-		    execlp ("./worker", "./worker", "mq_FW" ,"mq_WF", NULL);
-		   		    
-		    // we should never arrive here...
-		    perror ("execlp() failed");
-		}
-	    }
-
+		if (processID[i] < 0)
+		    {
+			perror("fork() failed");
+			exit (1);
+		    }
+		    else
+		    {
+			if (processID[i] == 0)
+			{
+			    printf ("child  pid:%d\n", getpid()); //noneed
+			   execlp ("./worker", "./worker", "mq_FW" ,"mq_WF", NULL);
+			   		    
+			    // we should never arrive here...
+			    perror ("execlp() failed");
+			}
+		    }
 	}   
 
     //  * do the farming
+	while(NROF_RECEIVED_MESSAGES < JOBS_NROF){   //repeat for the tottal number of jobs
+
+   //when the num of sent messages is < than the size of the queue && the char of the job is <= the end char of the alphabet we can send messages
+
+		if(NROF_SENT_MESSAGES < MQ_MAX_MESSAGES && JOB_CHAR <= ALPHABET_END_CHAR){  
+			
+			req.WORD_START_CHAR = JOB_CHAR;
+			req.WORD_LENGTH = MAX_MESSAGE_LENGTH;
+
+			mq_send(mq_fd_request, (const char *) &req, sizeof(req), 0);
+			++NROF_SENT_MESSAGES;
+
+		}
+		
+		mq_receive(mq_fd_response, (char *) &rsp, sizeof(rsp), NULL);
+		--NROF_SENT_MESSAGES;
+		++NROF_RECEIVED_MESSAGES;
+	}
+
 
 	
     //  * wait until the chilren have been stopped (see process_test())
