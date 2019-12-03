@@ -2,8 +2,8 @@
  * Operating Systems {2INCO} Practical Assignment
  * Interprocess Communication
  *
- * STUDENT_NAME_1 (STUDENT_NR_1)
- * STUDENT_NAME_2 (STUDENT_NR_2)
+ * Sonya Zarkova (1034611)
+ * Stefan van der Heijden (0910541)
  *
  * Grading:
  * Students who hand in clean code that fully satisfies the minimum requirements will get an 8. 
@@ -21,11 +21,15 @@
 #include <mqueue.h>         // for mq-stuff
 #include <time.h>           // for time()
 #include <complex.h>
-
+#include "settings.h"
 #include "common.h"
 #include "md5s.h"
 
+
 static void rsleep (int t);
+
+static char                 mq_FW[MQ_MAX_MESSAGES];
+static char                 mq_WF[MQ_MAX_MESSAGES];
 
 
 int main (int argc, char * argv[])
@@ -33,13 +37,31 @@ int main (int argc, char * argv[])
     // TODO:
     // (see message_queue_test() in interprocess_basic.c)
     //  * open the two message queues (whose names are provided in the arguments)
+    mqd_t               mq_fd_request;
+    mqd_t               mq_fd_response;
+    MQ_REQUEST_MESSAGE  req;
+    MQ_RESPONSE_MESSAGE rsp;
+    struct mq_attr      attr;
+
+    mq_fd_request = mq_open (mq_FW, O_RDONLY | O_EXCL);
+    mq_fd_response = mq_open (mq_WF, O_WRONLY | O_EXCL);
+
+   
+           
+            
+    
+          
     //  * repeatingly:
     //      - read from a message queue the new job to do
     //      - wait a random amount of time (e.g. rsleep(10000);)
+  rsleep (1000);
     //      - do that job 
     //      - write the results to a message queue
     //    until there are no more tasks to do
-    //  * close the message queues
+    //  * close the message queues 
+
+	mq_close (mq_fd_response);
+        mq_close (mq_fd_request);
     
     return (0);
 }
@@ -62,5 +84,4 @@ static void rsleep (int t)
     }
     usleep (random() % t);
 }
-
 
