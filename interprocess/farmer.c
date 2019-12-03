@@ -101,7 +101,7 @@ int main (int argc, char * argv[])
 		if(NROF_SENT_MESSAGES < MQ_MAX_MESSAGES && JOB_CHAR <= ALPHABET_END_CHAR){  
 			
 			req.WORD_START_CHAR = JOB_CHAR;
-			req.WORD_LENGTH = MAX_MESSAGE_LENGTH;
+			req.LENGTH = MAX_MESSAGE_LENGTH;
 
 			mq_send(mq_fd_request, (char *) &req, sizeof(req), 0);
 			++NROF_SENT_MESSAGES;
