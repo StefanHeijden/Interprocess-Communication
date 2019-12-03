@@ -28,7 +28,7 @@ typedef struct
 typedef struct
 {	int ID;	
 	int LENGTH;
-    	char M[MAX_MESSAGE_LENGTH};
+    	char M[MAX_MESSAGE_LENGTH];
 } MQ_RESPONSE_MESSAGE; //would need change maybe
 
 #endif
