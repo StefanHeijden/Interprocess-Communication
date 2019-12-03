@@ -25,7 +25,7 @@
 #include "common.h"
 #include "md5s.h"
 
-
+#define STUDENT_NAME  "SS"
 static void rsleep (int t);
 
 static char                 mq_FW[MQ_MAX_MESSAGES];
@@ -43,8 +43,12 @@ int main (int argc, char * argv[])
     MQ_RESPONSE_MESSAGE rsp;
     struct mq_attr      attr;
 
+    sprintf (mq_FW, "/mq_request_%s_%d", STUDENT_NAME, getpid());
+    sprintf (mq_WF, "/mq_response_%s_%d", STUDENT_NAME, getpid());
+
     mq_fd_request = mq_open (mq_FW, O_RDONLY | O_EXCL);
     mq_fd_response = mq_open (mq_WF, O_WRONLY | O_EXCL);
+
 
    
            
