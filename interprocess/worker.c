@@ -66,7 +66,7 @@ int main (int argc, char * argv[])
 	//      - do that job
 	
 	// Create string of a of length req
-	int len = sizeof(req); // length of the req hashvalue
+	int len = sizeof(mq_fd_request); // length of the req hashvalue
 	char check[len + 1];
 	
 	check[len] = '\0';
@@ -89,10 +89,10 @@ int main (int argc, char * argv[])
 		bool updated = false;
 		int pointer = len-1;
 		while(!updated) {
-			// If char is z then make it a and update char to the left
-			if(check[pointer] == 'z') {
-				check[pointer] = 'a';
-				if(pointer > 0) {
+			// If char is last then make it first and update char to the left
+			if(check[pointer] == ALPHABET_END_CHAR) {
+				check[pointer] = ALPHABET_START_CHAR;
+				if(pointer >= 0) {
 					pointer = pointer - 1; 
 				}
 				else{
