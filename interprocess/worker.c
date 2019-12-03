@@ -42,6 +42,7 @@ int main (int argc, char * argv[])
     MQ_REQUEST_MESSAGE  req;
     MQ_RESPONSE_MESSAGE rsp;
     struct mq_attr      attr;
+    bool processing = true;
 
     sprintf (mq_FW, "/mq_request_%s_%d", STUDENT_NAME, getpid());
     sprintf (mq_WF, "/mq_response_%s_%d", STUDENT_NAME, getpid());
@@ -49,24 +50,29 @@ int main (int argc, char * argv[])
     mq_fd_request = mq_open (mq_FW, O_RDONLY | O_EXCL);
     mq_fd_response = mq_open (mq_WF, O_WRONLY | O_EXCL);
 
-
+  //  printf ("information: %s, '", mq_FW);
    
-           
-            
-    
-          
     //  * repeatingly:
+	while(processing){
     //      - read from a message queue the new job to do
+	mq_receive(mq_fd_request, (char *) &req, sizeof(req), NULL);
     //      - wait a random amount of time (e.g. rsleep(10000);)
-  rsleep (1000);
+        rsleep (1000);
+
+	if(req.LENGTH ==0){
+		processing = false;
+	} 
+    //else
     //      - do that job 
+//{check md5 hash value}
     //      - write the results to a message queue
     //    until there are no more tasks to do
+	mq_send(mq_fd_response, (char *) &rsp, sizeof(rsp), 0);
     //  * close the message queues 
 
 	mq_close (mq_fd_response);
         mq_close (mq_fd_request);
-    
+    }
     return (0);
 }
 
