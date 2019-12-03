@@ -67,23 +67,45 @@ int main (int argc, char * argv[])
 	
 	// Create string of a of length req
 	int len = sizeof(req); // length of the req hashvalue
-	char check[len + 1] = "\0";
+	char check[len + 1];
+	
+	check[len] = '\0';
+	
 	for(int i = 0; i < len; i++){
-		check[i] = 0;
+		check[i] = 'a';
 	}
-	check[len] = (char *) &req// first char from the queu????
+	check[len] = 'a' ;// first char from the queu????
 	
 	// Check each possible md5s value for certain string length
 	bool found = false;
 	uint128_t new_hash;
 	while(!found){
 		// Compare hash value for current string
-		new_hash = md5s(check[i], len);
-		if(new_hash == req) {
+		new_hash = md5s(check, len);
+		if(new_hash == mq_fd_request) { 
 			found = true; // Stop if its found
 		}
 		// update checkvalue
-		checkvalue = checkvalue + 10;
+		bool updated = false;
+		int pointer = len-1;
+		while(!updated) {
+			// If char is z then make it a and update char to the left
+			if(check[pointer] == 'z') {
+				check[pointer] = 'a';
+				if(pointer > 0) {
+					pointer = pointer - 1; 
+				}
+				else{
+					updated = true;
+					//error?
+				}
+			}
+			// if not then update it, so that for example a --> b 
+			else{
+				check[pointer] = check[pointer] + 1;
+				updated = true;
+			}
+		}
 	}
 
     //      - write the results to a message queue
