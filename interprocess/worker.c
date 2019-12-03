@@ -62,16 +62,37 @@ int main (int argc, char * argv[])
 	if(req.LENGTH ==0){
 		processing = false;
 	} 
-    //else
-    //      - do that job 
-//{check md5 hash value}
+	
+	//      - do that job
+	
+	// Create string of a of length req
+	int len = sizeof(req); // length of the req hashvalue
+	char check[len + 1] = "\0";
+	for(int i = 0; i < len; i++){
+		check[i] = 0;
+	}
+	check[len] = (char *) &req// first char from the queu????
+	
+	// Check each possible md5s value for certain string length
+	bool found = false;
+	uint128_t new_hash;
+	while(!found){
+		// Compare hash value for current string
+		new_hash = md5s(check[i], len);
+		if(new_hash == req) {
+			found = true; // Stop if its found
+		}
+		// update checkvalue
+		checkvalue = checkvalue + 10;
+	}
+
     //      - write the results to a message queue
     //    until there are no more tasks to do
 	mq_send(mq_fd_response, (char *) &rsp, sizeof(rsp), 0);
     //  * close the message queues 
 
 	mq_close (mq_fd_response);
-        mq_close (mq_fd_request);
+    mq_close (mq_fd_request);
     }
     return (0);
 }
