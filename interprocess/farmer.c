@@ -3,7 +3,7 @@
  * Interprocess Communication
  *
  * Sonya Zarkova 1034611
- * STUDENT_NAME_2 (STUDENT_NR_2)
+ * Stefan van der Heijden 0910541
  *
  * Grading:
  * Students who hand in clean code that fully satisfies the minimum requirements will get an 8. 
@@ -22,6 +22,8 @@
 #include <errno.h>    
 #include <unistd.h>         // for execlp
 #include <mqueue.h>         // for mq
+#include <fcntl.h>           /* For O_* constants */
+#include <sys/stat.h>        /* For mode constants */
 
 #include "settings.h"
 #include "common.h"
@@ -55,7 +57,8 @@ int main (int argc, char * argv[])
 
 	    sprintf (mq_FW, "/mq_request_%s_%d", STUDENT_NAME, getpid());
 	    sprintf (mq_WF, "/mq_response_%s_%d", STUDENT_NAME, getpid());
-
+	
+            attr.mq_flags = 0;
 	    attr.mq_maxmsg  = MAX_MESSAGE_LENGTH;
 	    attr.mq_msgsize = sizeof (MQ_REQUEST_MESSAGE);
 	    mq_fd_request = mq_open (mq_FW, O_WRONLY | O_CREAT | O_EXCL, 0600, &attr);
@@ -68,7 +71,7 @@ int main (int argc, char * argv[])
     //  * create the child processes (see process_test() and message_queue_test())
 
 	printf ("parent pid:%d\n", getpid()); //noneed
-	for (int i=0; i< NROF_WORKERS; i++){
+	for (int i=0; i< NROF_WORKERS; ++i){
 
 		processID[i] = fork();
 
@@ -93,18 +96,18 @@ int main (int argc, char * argv[])
     //  * do the farming
 	while(NROF_RECEIVED_MESSAGES < JOBS_NROF){   //repeat for the tottal number of jobs
 
-   //when the num of sent messages is < than the size of the queue && the char of the job is <= the end char of the alphabet we can send messages
+   //when the num of sent messages is < than the size of the queue && the char of the job is <= the end char of the alphabet, we can send messages
 
 		if(NROF_SENT_MESSAGES < MQ_MAX_MESSAGES && JOB_CHAR <= ALPHABET_END_CHAR){  
 			
 			req.WORD_START_CHAR = JOB_CHAR;
 			req.WORD_LENGTH = MAX_MESSAGE_LENGTH;
 
-			mq_send(mq_fd_request, (const char *) &req, sizeof(req), 0);
+			mq_send(mq_fd_request, (char *) &req, sizeof(req), 0);
 			++NROF_SENT_MESSAGES;
 
 		}
-		
+		sleep(3);
 		mq_receive(mq_fd_response, (char *) &rsp, sizeof(rsp), NULL);
 		--NROF_SENT_MESSAGES;
 		++NROF_RECEIVED_MESSAGES;
@@ -114,7 +117,7 @@ int main (int argc, char * argv[])
 	
     //  * wait until the chilren have been stopped (see process_test())
 
- 	for( int i=0; i < NROF_WORKERS; i++){
+ 	for( int i=0; i < NROF_WORKERS; ++i){
 		waitpid (processID[i], NULL, 0);   // wait for the child 
 		printf ("child %d has been finished\n\n", processID[i]);
 	}
